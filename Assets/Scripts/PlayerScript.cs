@@ -9,7 +9,7 @@ public class PlayerScript : MonoBehaviour
     Vector3 checkpointPosition; //Variable for checkpoints for lvl 2 and 3
     GameObject currentCollectible;
 
-    //At the start "remembers" the player location
+    //At the start "remember" the player location
     void Start()
     {
         checkpointPosition = transform.position;
