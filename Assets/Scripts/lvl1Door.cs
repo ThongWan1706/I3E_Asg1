@@ -4,6 +4,7 @@ public class lvl1Door : MonoBehaviour
 {
     public PlayerScript player;
     public int coinsNeeded = 3;
+    public int specialItemNeeded = 1;
 
     bool opened = false;
 
@@ -13,14 +14,15 @@ public class lvl1Door : MonoBehaviour
 
         if (opened) return;
 
-        if (player.coinscollected >= coinsNeeded)
+        if (player.coinscollected >= coinsNeeded && player.specialitemcollected >= specialItemNeeded)
         {
             OpenDoor();
         }
         else
         {
             int coinleft = coinsNeeded - player.coinscollected;
-            Debug.Log("You still need to collect " + coinleft + " more coins!");
+            int specialitemleft = specialItemNeeded - player.specialitemcollected;
+            Debug.Log("You still need to collect " + coinleft + " more coins and " + specialitemleft + " more items!");
         }
     }
 

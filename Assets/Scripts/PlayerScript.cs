@@ -4,7 +4,7 @@ public class PlayerScript : MonoBehaviour
 {
     //Global variables for the game
     public int coinscollected = 0;
-    int specialitemcollected = 0;
+    public int specialitemcollected = 0;
     int totalspecialitem = 2;
     int totalcoins = 10;
     int health = 10;
@@ -22,93 +22,84 @@ public class PlayerScript : MonoBehaviour
     }
 
     //When the player uses the "F" key to collect the special item
-    void OnInteract() { 
-        if (currentCollectible != null) { 
-            //Refer to the Collectibles script where is the score for each collectible in the group 
-            SpecialItem collectible = currentCollectible.GetComponent<SpecialItem>(); 
+    void OnInteract()
+    {
+        //Check if we actually have something to collect
+        if (currentCollectible == null) return;
+
+        //Double-check the tag to make sure it's the specialItem
+        if (currentCollectible.CompareTag("SpecialItem"))
+        {
             specialitemcollected++;
-            print("Special Item Collected: " + specialitemcollected + "/ " + totalspecialitem); 
-            Destroy(currentCollectible); 
-        } 
+            Debug.Log("Special Item Collected: " + specialitemcollected);
+
+            //Find the reference to destroy it, then clean up the variable state
+            GameObject itemToDestroy = currentCollectible;
+            currentCollectible = null; 
+            
+            Destroy(itemToDestroy);
+        }
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Collectible")
+        if (collision.gameObject.CompareTag("Collectible"))
         {
-            currentCollectible = collision.gameObject;
             coinscollected++;
             print("Coins: " + coinscollected + "/" + totalcoins);
 
             audioSource.PlayOneShot(CoinSound);
-
             Destroy(collision.gameObject);
         }
     }
 
-     void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject == currentCollectible)
-        {
-            currentCollectible = null;
-        }
-    }
-
-    //When the player "touches" the item/trigger zones
+    // When the player "touches" the item/trigger zones
     void OnTriggerEnter(Collider other)
     {
-
         Debug.Log("Touched: " + other.name);
-        
-        //If the player collide with a coin (collectible)
-        if (other.CompareTag("Collectible"))
-        {
-            coinscollected++;
-            print("Coins: " + coinscollected + "/" + totalcoins);
-            Destroy(other.gameObject);
-        }
-        
-        //If the player collides on a special item (SpecialItem)
+
+        // If a player "touches" a special item
         if (other.CompareTag("SpecialItem"))
         {
             currentCollectible = other.gameObject;
+            Debug.Log("Special item detected and targeted.");
         }
 
-        //If the player steps onto the GoalArea
+        // If the player steps onto the GoalArea
         if (other.CompareTag("GoalArea") && coinscollected >= totalcoins)
         {
             print("Level Complete!");
             print("Total Coins Collected: " + coinscollected + "/" + totalcoins);
         }
 
-        //If the player step onto water/lava
+        // If the player step onto water/lava
         if (other.CompareTag("Hazard"))
         {
             health--;
 
-        // Check for Character Controller
-        CharacterController cc = GetComponent<CharacterController>();
-        if (cc != null)
+            // Check for Character Controller
+            CharacterController cc = GetComponent<CharacterController>();
+            if (cc != null)
             {
-                cc.enabled = false; // Turn it off
-                transform.position = checkpointPosition; // Move the player
+                cc.enabled = false; // Turn the freeze transform off from the rigidbody
+                transform.position = checkpointPosition; // Move the player back to the checkpoint
                 cc.enabled = true; // Turn it back on
             }
-        else
+            else
             {
-            transform.position = checkpointPosition;
+                transform.position = checkpointPosition;
             }
 
-        print("Respawned!");
-        print("Health: " + health);
+            print("Respawned!");
+            print("Health: " + health);
 
-        if (health <= 0)
+            if (health <= 0)
             {
                 print("Game Over!");
             }
-        } 
+        }
 
-        //If the player steps onto a checkpoint
+        // If the player steps onto a checkpoint
         if (other.CompareTag("Checkpoint"))
         {
             checkpointPosition = other.transform.position;
@@ -118,9 +109,11 @@ public class PlayerScript : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        if (other.gameObject == currentCollectible)
+        // Only clear the collectible if we are actually walking away from the one we targeted
+        if (currentCollectible != null && other.gameObject == currentCollectible)
         {
             currentCollectible = null;
+            Debug.Log("Walked away from special item.");
         }
     }
 }
