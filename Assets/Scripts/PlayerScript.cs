@@ -1,42 +1,115 @@
 using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {
     //Global variables for the game
     public int coinscollected = 0;
     public int specialitemcollected = 0;
-    int totalspecialitem = 2;
+    int totalspecialitem = 3;
     int totalcoins = 10;
     int health = 10;
     Vector3 checkpointPosition; //Variable for checkpoints for lvl 2 and 3
     GameObject currentCollectible;
 
+    //References for the UI display
+    public TextMeshProUGUI healthTextDisplay;
+    public TextMeshProUGUI coinsTextDisplay;
+    public TextMeshProUGUI specialItemTextDisplay;
+    public Image specialItemIconDisplay;
+    public GameObject collectiblesPanelObject; // Reference to hold the background panel
+
     //Sounds
     public AudioSource audioSource;
     public AudioClip CoinSound;
+
+    // Cards
+    public GameObject blueCardUI;
+    public GameObject redCardUI;
+    public GameObject securityCardUI;
+
 
     //At the start "remember" the player location
     void Start()
     {
         checkpointPosition = transform.position;
+        UpdateUI();
+
+        if (collectiblesPanelObject != null)
+        {
+            collectiblesPanelObject.SetActive(false);
+        }
+
+        // Hide UI cards at start
+        if (blueCardUI != null) blueCardUI.SetActive(false);
+        if (redCardUI != null) redCardUI.SetActive(false);
+        if (securityCardUI != null) securityCardUI.SetActive(false);
+    }
+
+    void UpdateUI()
+    {
+        if (healthTextDisplay != null)
+        {
+            healthTextDisplay.text = "HP:" + health;
+        }
+
+        if (coinsTextDisplay != null)
+        {
+            coinsTextDisplay.text = "Points:" + coinscollected;
+        }
+
+        if (specialItemTextDisplay != null)
+        {
+            specialItemTextDisplay.text = "Collectibles";
+        }
     }
 
     //When the player uses the "F" key to collect the special item
     void OnInteract()
     {
-        //Check if we actually have something to collect
         if (currentCollectible == null) return;
 
-        //Double-check the tag to make sure it's the specialItem
         if (currentCollectible.CompareTag("SpecialItem"))
         {
             specialitemcollected++;
             Debug.Log("Special Item Collected: " + specialitemcollected);
 
-            //Find the reference to destroy it, then clean up the variable state
+            if (collectiblesPanelObject != null && !collectiblesPanelObject.activeSelf)
+            {
+                collectiblesPanelObject.SetActive(true);
+            }
+
+            SpecialItem itemData = currentCollectible.GetComponent<SpecialItem>();
+            if (itemData != null)
+            {
+                // 1. Set the background display image sprite if needed
+                if (specialItemIconDisplay != null)
+                {
+                    specialItemIconDisplay.sprite = itemData.itemIcon;
+                }
+
+
+                Debug.Log("Processing item type: " + itemData.cardType);
+
+                if (itemData.cardType == "Blue" && blueCardUI != null)
+                {
+                    blueCardUI.SetActive(true);
+                }
+                else if (itemData.cardType == "Red" && redCardUI != null)
+                {
+                    redCardUI.SetActive(true);
+                }
+                else if (itemData.cardType == "Security" && securityCardUI != null)
+                {
+                    securityCardUI.SetActive(true);
+                }
+            }
+
+            UpdateUI();
+
             GameObject itemToDestroy = currentCollectible;
-            currentCollectible = null; 
-            
+            currentCollectible = null;
             Destroy(itemToDestroy);
         }
     }
@@ -47,6 +120,8 @@ public class PlayerScript : MonoBehaviour
         {
             coinscollected++;
             print("Coins: " + coinscollected + "/" + totalcoins);
+
+            UpdateUI();
 
             audioSource.PlayOneShot(CoinSound);
             Destroy(collision.gameObject);
@@ -76,6 +151,8 @@ public class PlayerScript : MonoBehaviour
         if (other.CompareTag("Hazard"))
         {
             health--;
+
+            UpdateUI();
 
             // Check for Character Controller
             CharacterController cc = GetComponent<CharacterController>();
