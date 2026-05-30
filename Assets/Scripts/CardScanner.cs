@@ -27,7 +27,6 @@ public class CardScanner : MonoBehaviour
 
     void Update()
     {
-        // 🛠️ FIXED: Modern Input System check for the 'F' keypress
         if (playerIsNearby && Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame)
         {
             if (isUnlocked)
@@ -67,7 +66,7 @@ public class CardScanner : MonoBehaviour
         if (requiredCardType == "Blue" && hasBlueCard)
         {
             isUnlocked = true; 
-            targetDoor.ToggleDoor(); // Open the door!
+            targetDoor.ToggleDoor(); // Open up the door
             Debug.Log("Card detected! Access Granted.");
 
             if (promptTextDisplay != null)
