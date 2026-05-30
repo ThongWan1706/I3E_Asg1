@@ -56,7 +56,7 @@ public class PlayerScript : MonoBehaviour
 
         if (coinsTextDisplay != null)
         {
-            coinsTextDisplay.text = "Points:" + coinscollected;
+            coinsTextDisplay.text = "Points:" + coinscollected + " / " + totalcoins;
         }
 
         if (specialItemTextDisplay != null)
@@ -116,15 +116,23 @@ public class PlayerScript : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+        // Check if the object we hit has a Coins component
         if (collision.gameObject.CompareTag("Collectible"))
         {
-            coinscollected++;
-            print("Coins: " + coinscollected + "/" + totalcoins);
+            Coins coin = collision.gameObject.GetComponent<Coins>();
+            
+            if (coin != null)
+            {
+                // Add the score dynamically based on what the coin is worth
+                coinscollected += coin.scoreValue; 
+                print("Coins: " + coinscollected + "/" + totalcoins);
 
-            UpdateUI();
+                //Refresh the UI text
+                UpdateUI();
 
-            audioSource.PlayOneShot(CoinSound);
-            Destroy(collision.gameObject);
+                //Tell the coin to play its sound and destroy itself
+                coin.Collect(); 
+            }
         }
     }
 

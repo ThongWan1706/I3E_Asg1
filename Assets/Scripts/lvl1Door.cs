@@ -1,42 +1,29 @@
 using UnityEngine;
 
-public class lvl1Door : MonoBehaviour
+public class Door : MonoBehaviour
 {
-    public PlayerScript player;
-    public int coinsNeeded = 3;
-    public int specialItemNeeded = 1;
+    Animator animator;
+    
+    private bool isOpen = false; 
 
-    bool opened = false;
-
-    private void OnTriggerEnter(Collider other)
+    void Start()
     {
-        if (!other.CompareTag("Player")) return;
+        animator = GetComponentInParent<Animator>();
+    }
 
-        if (opened) return;
+    public void ToggleDoor()
+    {
+        isOpen = !isOpen; 
 
-        if (player.coinscollected >= coinsNeeded && player.specialitemcollected >= specialItemNeeded)
+        if (isOpen)
         {
-            OpenDoor();
+            animator.SetTrigger("OpenDoor");
+            Debug.Log("Door opened");
         }
         else
         {
-            int coinleft = coinsNeeded - player.coinscollected;
-            int specialitemleft = specialItemNeeded - player.specialitemcollected;
-            Debug.Log("You still need to collect " + coinleft + " more coins and " + specialitemleft + " more items!");
-        }
-    }
-
-    void OpenDoor()
-    {
-        opened = true;
-        Debug.Log("Door Opened!");
-    }
-
-    private void Update()
-    {
-        if (opened)
-        {
-            transform.position += Vector3.up * Time.deltaTime * 2f;
+            animator.SetTrigger("CloseDoor");
+            Debug.Log("Door closed");
         }
     }
 }
