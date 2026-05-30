@@ -3,27 +3,54 @@ using UnityEngine;
 public class Door : MonoBehaviour
 {
     Animator animator;
-    
     private bool isOpen = false; 
+
+    //Indicator Settings
+    public MeshRenderer indicatorRenderer; 
+    public Color lockedColor = Color.red;
+    public Color unlockedColor = Color.green;
+
+    //Audio Settungs
+    public AudioSource audioSource; 
+    public AudioClip openDoorSound; 
 
     void Start()
     {
         animator = GetComponentInParent<Animator>();
+        SetIndicatorColor(lockedColor);
     }
 
     public void ToggleDoor()
     {
         isOpen = !isOpen; 
+        
+        // Turn indicator green permanently on the first toggle
+        SetIndicatorColor(unlockedColor);
 
+        // Play the sound effect
+        if (audioSource != null && openDoorSound != null)
+        {
+            audioSource.PlayOneShot(openDoorSound);
+        }
+
+        // Run the animations
         if (isOpen)
         {
             animator.SetTrigger("OpenDoor");
-            Debug.Log("Door opened");
+            Debug.Log("Door opening animation fired.");
         }
         else
         {
             animator.SetTrigger("CloseDoor");
-            Debug.Log("Door closed");
+            Debug.Log("Door closing animation fired.");
+        }
+    }
+
+    private void SetIndicatorColor(Color targetColor)
+    {
+        if (indicatorRenderer != null)
+        {
+            indicatorRenderer.material.color = targetColor;
         }
     }
 }
