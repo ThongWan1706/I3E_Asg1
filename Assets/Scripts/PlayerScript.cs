@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections; // Required for Coroutines
 
 public class PlayerScript : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class PlayerScript : MonoBehaviour
     int health = 10;
     Vector3 checkpointPosition; //Variable for checkpoints for lvl 2 and 3
     GameObject currentCollectible;
+    private bool isRespawning = false; //To prevent double triggering for the hazard
 
     //References for the UI display
     public TextMeshProUGUI healthTextDisplay;
@@ -19,6 +21,7 @@ public class PlayerScript : MonoBehaviour
     public TextMeshProUGUI specialItemTextDisplay;
     public Image specialItemIconDisplay;
     public GameObject collectiblesPanelObject; // Reference to hold the background panel
+    public Image blackoutPanel; //For the blackout while death
 
     //Sounds
     public AudioSource audioSource;
@@ -120,18 +123,18 @@ public class PlayerScript : MonoBehaviour
         if (collision.gameObject.CompareTag("Collectible"))
         {
             Coins coin = collision.gameObject.GetComponent<Coins>();
-            
+
             if (coin != null)
             {
                 // Add the score dynamically based on what the coin is worth
-                coinscollected += coin.scoreValue; 
+                coinscollected += coin.scoreValue;
                 print("Coins: " + coinscollected + "/" + totalcoins);
 
                 //Refresh the UI text
                 UpdateUI();
 
                 //Tell the coin to play its sound and destroy itself
-                coin.Collect(); 
+                coin.Collect();
             }
         }
     }
@@ -155,48 +158,19 @@ public class PlayerScript : MonoBehaviour
             print("Total Coins Collected: " + coinscollected + "/" + totalcoins);
         }
 
-        // If the player step onto water/lava
-        if (other.CompareTag("Hazard"))
+        // If the player step onto water/lava and haven'tspawning
+        if (other.CompareTag("Hazard") && !isRespawning)
         {
-            health--;
-
-            UpdateUI();
-
-            // Check for Character Controller
-            CharacterController cc = GetComponent<CharacterController>();
-            if (cc != null)
-            {
-                cc.enabled = false; // Turn the freeze transform off from the rigidbody
-                transform.position = checkpointPosition; // Move the player back to the checkpoint
-                cc.enabled = true; // Turn it back on
-            }
-            else
-            {
-                transform.position = checkpointPosition;
-            }
-
-            print("Respawned!");
-            print("Health: " + health);
-
-            if (health <= 0)
-            {
-                print("Game Over!");
-            }
+            Debug.Log("Hazard detected! Starting death sequence...");
+            StartCoroutine(HandleDeath());
         }
 
-        // If the player steps onto a checkpoint
+        // ... (Keep your other trigger logic for Checkpoints, SpecialItems, etc.)
         if (other.CompareTag("Checkpoint"))
         {
             checkpointPosition = other.transform.position;
-            print("Checkpoint Saved!");
-
-            Checkpoint checkpointScript = other.GetComponent<Checkpoint>();
-            
-            // Only if the script exists, then it will trigger 
-            if (checkpointScript != null)
-            {
-                checkpointScript.ActivateCheckpoint();
-            }
+            Checkpoint cp = other.GetComponent<Checkpoint>();
+            if (cp != null) cp.ActivateCheckpoint();
         }
     }
 
@@ -207,6 +181,51 @@ public class PlayerScript : MonoBehaviour
         {
             currentCollectible = null;
             Debug.Log("Walked away from special item.");
+        }
+    }
+
+
+    //For the death scene blackout
+    IEnumerator HandleDeath()
+    {
+        isRespawning = true; // Lock: prevent any other triggers while dying
+
+        health -= 2; // Subtract  2 HP
+        UpdateUI();
+        Debug.Log("Health reduced to: " + health);
+
+        if (blackoutPanel == null) yield break;
+
+        float fadeDuration = 0.5f; // How fast the screen goes black
+        float timer = 0f;
+
+        //Fade into black
+        Color startColor = new Color(0, 0, 0, 0); // Fully transparent
+        Color endColor = new Color(0, 0, 0, 1);   // Fully opaque
+
+        while (timer < fadeDuration)
+        {
+            timer += Time.deltaTime;
+            blackoutPanel.color = Color.Lerp(startColor, endColor, timer / fadeDuration);
+            yield return null;
+        }
+
+        //Stay out black for 3 seconds
+        yield return new WaitForSeconds(3f);
+
+        // 3. Respawn the player
+        CharacterController cc = GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
+        transform.position = checkpointPosition;
+        if (cc != null) cc.enabled = true;
+
+        //Fade out from black
+        timer = 0f;
+        while (timer < fadeDuration)
+        {
+            timer += Time.deltaTime;
+            blackoutPanel.color = Color.Lerp(endColor, startColor, timer / fadeDuration);
+            yield return null;
         }
     }
 }
