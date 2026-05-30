@@ -8,7 +8,7 @@ public class PlayerScript : MonoBehaviour
     public int coinscollected = 0;
     public int specialitemcollected = 0;
     int totalspecialitem = 3;
-    int totalcoins = 10;
+    int totalcoins = 20;
     int health = 10;
     Vector3 checkpointPosition; //Variable for checkpoints for lvl 2 and 3
     GameObject currentCollectible;
@@ -56,7 +56,7 @@ public class PlayerScript : MonoBehaviour
 
         if (coinsTextDisplay != null)
         {
-            coinsTextDisplay.text = "Points:" + coinscollected + " / " + totalcoins;
+            coinsTextDisplay.text = "Coins: " + coinscollected + " / " + totalcoins;
         }
 
         if (specialItemTextDisplay != null)
@@ -83,7 +83,7 @@ public class PlayerScript : MonoBehaviour
             SpecialItem itemData = currentCollectible.GetComponent<SpecialItem>();
             if (itemData != null)
             {
-                // 1. Set the background display image sprite if needed
+
                 if (specialItemIconDisplay != null)
                 {
                     specialItemIconDisplay.sprite = itemData.itemIcon;
@@ -189,6 +189,14 @@ public class PlayerScript : MonoBehaviour
         {
             checkpointPosition = other.transform.position;
             print("Checkpoint Saved!");
+
+            Checkpoint checkpointScript = other.GetComponent<Checkpoint>();
+            
+            // Only if the script exists, then it will trigger 
+            if (checkpointScript != null)
+            {
+                checkpointScript.ActivateCheckpoint();
+            }
         }
     }
 
