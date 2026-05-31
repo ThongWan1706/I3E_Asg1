@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections; // Required for Coroutines
+using UnityEngine.SceneManagement; // Add this to the top of your script
 
 public class PlayerScript : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class PlayerScript : MonoBehaviour
     Vector3 checkpointPosition; //Variable for checkpoints for lvl 2 and 3
     GameObject currentCollectible;
     private bool isRespawning = false; //To prevent double triggering for the hazard
+    public GameObject gameOverPanel; // Drag your panel here in the Inspector
 
     //References for the UI display
     public TextMeshProUGUI healthTextDisplay;
@@ -184,6 +186,18 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+    public void RestartGame()
+    {
+        Time.timeScale = 1; // Unpause
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Reloads current scene
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+        Debug.Log("Quit requested");
+    }
+
 
     //For the death scene blackout
     IEnumerator HandleDeath()
@@ -214,12 +228,22 @@ public class PlayerScript : MonoBehaviour
         yield return new WaitForSeconds(3f);
 
         // 3. Respawn the player
-        CharacterController cc = GetComponent<CharacterController>();
-        if (cc != null) cc.enabled = false;
-        transform.position = checkpointPosition;
-        if (cc != null) cc.enabled = true;
+        if (health > 0)
+        {
+            CharacterController cc = GetComponent<CharacterController>();
+            if (cc != null) cc.enabled = false;
+            transform.position = checkpointPosition;
+            if (cc != null) cc.enabled = true;
+        }
+        else
+        {
+            Time.timeScale = 0;
+            if (gameOverPanel != null) gameOverPanel.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
 
-        //Fade out from black
+        // Fade out from black
         timer = 0f;
         while (timer < fadeDuration)
         {
@@ -227,5 +251,7 @@ public class PlayerScript : MonoBehaviour
             blackoutPanel.color = Color.Lerp(endColor, startColor, timer / fadeDuration);
             yield return null;
         }
+        
+        isRespawning = false;
     }
 }
