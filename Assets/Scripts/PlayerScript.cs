@@ -10,7 +10,7 @@ public class PlayerScript : MonoBehaviour
     public int coinscollected = 0;
     public int specialitemcollected = 0;
     int totalspecialitem = 3;
-    int totalcoins = 20;
+    int totalcoins = 30;
     int health = 10;
     Vector3 checkpointPosition; //Variable for checkpoints for lvl 2 and 3
     GameObject currentCollectible;
@@ -75,48 +75,34 @@ public class PlayerScript : MonoBehaviour
     {
         if (currentCollectible == null) return;
 
-        if (currentCollectible.CompareTag("SpecialItem"))
+        // Handle Blue Card
+        if (currentCollectible.CompareTag("BlueCard"))
         {
-            specialitemcollected++;
-            Debug.Log("Special Item Collected: " + specialitemcollected);
-
-            if (collectiblesPanelObject != null && !collectiblesPanelObject.activeSelf)
-            {
-                collectiblesPanelObject.SetActive(true);
-            }
-
-            SpecialItem itemData = currentCollectible.GetComponent<SpecialItem>();
-            if (itemData != null)
-            {
-
-                if (specialItemIconDisplay != null)
-                {
-                    specialItemIconDisplay.sprite = itemData.itemIcon;
-                }
-
-
-                Debug.Log("Processing item type: " + itemData.cardType);
-
-                if (itemData.cardType == "Blue" && blueCardUI != null)
-                {
-                    blueCardUI.SetActive(true);
-                }
-                else if (itemData.cardType == "Red" && redCardUI != null)
-                {
-                    redCardUI.SetActive(true);
-                }
-                else if (itemData.cardType == "Security" && securityCardUI != null)
-                {
-                    securityCardUI.SetActive(true);
-                }
-            }
-
-            UpdateUI();
-
-            GameObject itemToDestroy = currentCollectible;
-            currentCollectible = null;
-            Destroy(itemToDestroy);
+            HandleCardCollection("Blue", blueCardUI);
         }
+        // Handle Red Card
+        else if (currentCollectible.CompareTag("RedCard"))
+        {
+            HandleCardCollection("Red", redCardUI);
+        }
+
+    }
+
+    void HandleCardCollection(string cardName, GameObject cardUI)
+    {
+        specialitemcollected++;
+        Debug.Log(cardName + " Card Collected!");
+
+        if (collectiblesPanelObject != null && !collectiblesPanelObject.activeSelf)
+            collectiblesPanelObject.SetActive(true);
+
+        if (cardUI != null)
+            cardUI.SetActive(true);
+
+        UpdateUI();
+
+        Destroy(currentCollectible);
+        currentCollectible = null;
     }
 
     void OnCollisionEnter(Collision collision)
@@ -146,11 +132,11 @@ public class PlayerScript : MonoBehaviour
     {
         Debug.Log("Touched: " + other.name);
 
-        // If a player "touches" a special item
-        if (other.CompareTag("SpecialItem"))
+        // If a player "touches" a card
+        if (other.CompareTag("BlueCard") || other.CompareTag("RedCard") || other.CompareTag("WhiteCard"))
         {
             currentCollectible = other.gameObject;
-            Debug.Log("Special item detected and targeted.");
+            Debug.Log("Card detected: " + other.tag);
         }
 
         // If the player steps onto the GoalArea
@@ -251,7 +237,7 @@ public class PlayerScript : MonoBehaviour
             blackoutPanel.color = Color.Lerp(endColor, startColor, timer / fadeDuration);
             yield return null;
         }
-        
+
         isRespawning = false;
     }
 }

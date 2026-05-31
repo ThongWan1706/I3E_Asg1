@@ -1,10 +1,10 @@
 using UnityEngine;
 using TMPro;
 
-public class Bluecard : MonoBehaviour
+public class Redcard : MonoBehaviour
 {
     //Item Settings
-    public string cardType = "Blue"; // "Blue", "Red", or "Security"
+    public string cardType = "Red"; // "Blue", "Red", or "Security"
     public Sprite itemIcon;
     public float rotateSpeed = 100f;
     public int score = 1; 
@@ -12,7 +12,7 @@ public class Bluecard : MonoBehaviour
     //UI Display
     [Header("Assign 'InteractiveText' Here")]
     public TextMeshProUGUI promptTextDisplay;
-    public string pickupPrompt = "Press 'F' to pick up Blue Keycard";
+    public string pickupPrompt = "Press 'F' to pick up Red Keycard";
 
     void Start()
     {

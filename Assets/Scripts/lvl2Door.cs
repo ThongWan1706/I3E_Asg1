@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class lvl1Door : MonoBehaviour
+public class lvl2Door : MonoBehaviour
 {
     Animator animator;
     private bool isOpen = false; 

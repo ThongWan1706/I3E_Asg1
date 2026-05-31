@@ -2,10 +2,10 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;
 
-public class CardScanner : MonoBehaviour
+public class lvl1CardScanner : MonoBehaviour
 {
     public string requiredCardType = "Blue"; 
-    public Door targetDoor;                  
+    public lvl1Door targetDoor;                  
 
     // UI Display settings
     public TextMeshProUGUI promptTextDisplay;
