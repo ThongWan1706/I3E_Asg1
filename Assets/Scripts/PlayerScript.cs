@@ -84,6 +84,11 @@ public class PlayerScript : MonoBehaviour
         {
             HandleCardCollection("Red", redCardUI);
         }
+        // Handle White Card
+        else if (currentCollectible.CompareTag("WhiteCard"))
+        {
+            HandleCardCollection("White", securityCardUI);
+        }
 
     }
 
@@ -149,7 +154,13 @@ public class PlayerScript : MonoBehaviour
         if (other.CompareTag("Hazard") && !isRespawning)
         {
             Debug.Log("Hazard detected! Starting death sequence...");
-            StartCoroutine(HandleDeath());
+            StartCoroutine(HandleDeath(isInstantDeath: false));
+        }
+
+        if (other.CompareTag("OneShot") && !isRespawning)
+        {
+            Debug.Log("Hazard detected! Starting death sequence...");
+            StartCoroutine(HandleDeath(isInstantDeath: true));
         }
 
         if (other.CompareTag("Checkpoint"))
@@ -184,20 +195,31 @@ public class PlayerScript : MonoBehaviour
 
 
     //For the death scene blackout
-    IEnumerator HandleDeath()
+    // Updated to accept a boolean parameter
+    IEnumerator HandleDeath(bool isInstantDeath)
     {
         isRespawning = true; // Lock: prevent any other triggers while dying
 
-        health -= 2; // Subtract  2 HP
+        // Dynamic health reduction logic
+        if (isInstantDeath)
+        {
+            health = 0; // Drop to instant 0 HP
+            Debug.Log("Instant death triggered!");
+        }
+        else
+        {
+            health -= 2; // Subtract normal 2 HP
+        }
+
         UpdateUI();
         Debug.Log("Health reduced to: " + health);
 
         if (blackoutPanel == null) yield break;
 
-        float fadeDuration = 0.5f; // How fast the screen goes black
+        float fadeDuration = 0.5f;
         float timer = 0f;
 
-        //Fade into black
+        // Fade into black
         Color startColor = new Color(0, 0, 0, 0); // Fully transparent
         Color endColor = new Color(0, 0, 0, 1);   // Fully opaque
 
@@ -208,10 +230,10 @@ public class PlayerScript : MonoBehaviour
             yield return null;
         }
 
-        //Stay out black for 3 seconds
+        // Stay out black for 3 seconds
         yield return new WaitForSeconds(3f);
 
-        // 3. Respawn the player
+        // Respawn or Game Over check
         if (health > 0)
         {
             CharacterController cc = GetComponent<CharacterController>();
@@ -222,7 +244,11 @@ public class PlayerScript : MonoBehaviour
         else
         {
             Time.timeScale = 0;
-            if (gameOverPanel != null) gameOverPanel.SetActive(true);
+            if (gameOverPanel != null)
+            {
+                gameOverPanel.SetActive(true);
+            }
+
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }

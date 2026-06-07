@@ -11,6 +11,8 @@ TagManager:
   - Checkpoint
   - BlueCard
   - RedCard
+  - SpecialItem
+  - OneShot
   layers:
   - Default
   - TransparentFX
