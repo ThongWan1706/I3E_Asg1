@@ -9,7 +9,6 @@ public class PlayerScript : MonoBehaviour
     //Global variables for the game
     public int coinscollected = 0;
     public int specialitemcollected = 0;
-    int totalspecialitem = 3;
     int totalcoins = 30;
     int health = 10;
     Vector3 checkpointPosition; //Variable for checkpoints for lvl 2 and 3
@@ -153,7 +152,6 @@ public class PlayerScript : MonoBehaviour
             StartCoroutine(HandleDeath());
         }
 
-        // ... (Keep your other trigger logic for Checkpoints, SpecialItems, etc.)
         if (other.CompareTag("Checkpoint"))
         {
             checkpointPosition = other.transform.position;

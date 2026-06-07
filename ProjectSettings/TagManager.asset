@@ -7,10 +7,10 @@ TagManager:
   - CinemachineTarget
   - Collectible
   - Hazard
-  - SpecialItem
   - GoalArea
   - Checkpoint
   - BlueCard
+  - RedCard
   layers:
   - Default
   - TransparentFX
