@@ -187,16 +187,37 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+    //If the player want to restart the game once they lose all of their hp
     public void RestartGame()
     {
         Time.timeScale = 1; // Unpause
         SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Reloads current scene
     }
 
+    //If the player want to quit the game once they lose all of their hp
     public void QuitGame()
     {
         Application.Quit();
         Debug.Log("Quit requested");
+    }
+
+    public void TakeDamage(int amount)
+    {
+        // Don't take damage if already in the middle of a checkpoint respawn
+        if (isRespawning) return; 
+
+        health -= amount;
+        
+        // Prevent health from dropping below 0
+        if (health < 0) health = 0; 
+
+        UpdateUI();
+
+        // If health hits 0, trigger the death sequence
+        if (health <= 0)
+        {
+            StartCoroutine(HandleDeath(isInstantDeath: true));
+        }
     }
 
 

@@ -72,9 +72,6 @@ public class TrapDoor : MonoBehaviour
         
         animator.SetTrigger("CloseDoor");
         Debug.Log("Trap door slamming shut to push player!");
-
-        // 5. Keep the door locked forever (or reset after a long delay if needed)
-        // Leaving isTrapping = true makes this a one-time trap per scene load.
     }
 
     private void OnTriggerEnter(Collider other)
