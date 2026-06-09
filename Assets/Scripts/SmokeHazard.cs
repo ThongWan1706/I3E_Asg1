@@ -11,7 +11,7 @@ public class SmokeHazard : MonoBehaviour
 {
     //Damage settings for the smoke
     [SerializeField] private int damageAmount = 1;
-    [SerializeField] private float damageInterval = 2.0f; // Time in seconds between ticks
+    [SerializeField] private float damageInterval = 4.0f; // Time in seconds between ticks
 
     private Coroutine damageCoroutine;
 
