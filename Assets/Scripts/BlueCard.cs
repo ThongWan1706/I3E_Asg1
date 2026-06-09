@@ -1,3 +1,9 @@
+/*
+* Author: Lam Thong Wan
+* Date: 9 Jun 2026
+* Description: This code is specifically for the blue card where players will be collecting it at lvl 1 in order to open the door
+*/
+
 using UnityEngine;
 using TMPro;
 

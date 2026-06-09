@@ -1,3 +1,9 @@
+/*
+* Author: Lam Thong Wan
+* Date: 9 Jun 2026
+* Description: This code is specifically for the player interactions throughout the gameplay
+*/
+
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;

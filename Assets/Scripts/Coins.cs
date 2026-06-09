@@ -1,3 +1,9 @@
+/*
+* Author: Lam Thong Wan
+* Date: 9 Jun 2026
+* Description: This code is specifically for the coins as a collectible for the player to collide and collect the coins
+*/
+
 using UnityEngine;
 
 public class Coins : MonoBehaviour

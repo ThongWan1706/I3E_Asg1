@@ -1,3 +1,9 @@
+/*
+* Author: Lam Thong Wan
+* Date: 9 Jun 2026
+* Description: This code is specifically for the lvl 1 door that requires the player to use the blue card to open the door
+*/
+
 using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;

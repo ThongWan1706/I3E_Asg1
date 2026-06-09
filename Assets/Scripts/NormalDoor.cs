@@ -1,3 +1,9 @@
+/*
+* Author: Lam Thong Wan
+* Date: 9 Jun 2026
+* Description: This code is specifically for the doors that do not require any card to open
+*/
+
 using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;

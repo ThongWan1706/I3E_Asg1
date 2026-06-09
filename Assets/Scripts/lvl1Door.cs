@@ -1,3 +1,9 @@
+/*
+* Author: Lam Thong Wan
+* Date: 9 Jun 2026
+* Description: This code is specifically for the lvl 1 door that contains the door indicator that shows whether the door is locked or not, it also includes in the open and close door animation
+*/
+
 using UnityEngine;
 
 public class lvl1Door : MonoBehaviour
