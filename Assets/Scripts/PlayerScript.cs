@@ -28,7 +28,7 @@ public class PlayerScript : MonoBehaviour
     public TextMeshProUGUI specialItemTextDisplay;
     public Image specialItemIconDisplay;
     public GameObject collectiblesPanelObject; // Reference to hold the background panel
-    public Image blackoutPanel; //For the blackout while death
+    public GameObject blackoutPanel; //For the blackout while death
 
     //Sounds
     public AudioSource audioSource;
@@ -204,12 +204,12 @@ public class PlayerScript : MonoBehaviour
     public void TakeDamage(int amount)
     {
         // Don't take damage if already in the middle of a checkpoint respawn
-        if (isRespawning) return; 
+        if (isRespawning) return;
 
         health -= amount;
-        
+
         // Prevent health from dropping below 0
-        if (health < 0) health = 0; 
+        if (health < 0) health = 0;
 
         UpdateUI();
 
@@ -225,40 +225,44 @@ public class PlayerScript : MonoBehaviour
     // Updated to accept a boolean parameter
     IEnumerator HandleDeath(bool isInstantDeath)
     {
-        isRespawning = true; // Lock: prevent any other triggers while dying
+        isRespawning = true; 
 
-        // Dynamic health reduction logic
         if (isInstantDeath)
         {
-            health = 0; // Drop to instant 0 HP
-            Debug.Log("Instant death triggered!");
+            health = 0; 
         }
         else
         {
-            health -= 2; // Subtract normal 2 HP
+            health -= 2; 
         }
 
         UpdateUI();
         Debug.Log("Health reduced to: " + health);
 
-        if (blackoutPanel == null) yield break;
-
-        float fadeDuration = 0.5f;
-        float timer = 0f;
-
-        // Fade into black
-        Color startColor = new Color(0, 0, 0, 0); // Fully transparent
-        Color endColor = new Color(0, 0, 0, 1);   // Fully opaque
-
-        while (timer < fadeDuration)
+        //Turn on the Blackout Screen Canvas GameObject
+        if (blackoutPanel != null) 
         {
-            timer += Time.deltaTime;
-            blackoutPanel.color = Color.Lerp(startColor, endColor, timer / fadeDuration);
-            yield return null;
+            blackoutPanel.SetActive(true);
+            
+            // Try to fade it if it has an image on it
+            Image img = blackoutPanel.GetComponentInChildren<Image>();
+            if (img != null)
+            {
+                float fadeDuration = 0.5f;
+                float timer = 0f;
+                Color startColor = new Color(0, 0, 0, 0);
+                Color endColor = new Color(0, 0, 0, 1);
+
+                while (timer < fadeDuration)
+                {
+                    timer += Time.unscaledDeltaTime;
+                    img.color = Color.Lerp(startColor, endColor, timer / fadeDuration);
+                    yield return null;
+                }
+            }
         }
 
-        // Stay out black for 3 seconds
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSecondsRealtime(3f);
 
         // Respawn or Game Over check
         if (health > 0)
@@ -270,7 +274,7 @@ public class PlayerScript : MonoBehaviour
         }
         else
         {
-            Time.timeScale = 0;
+            Time.timeScale = 0; // Freeze the gameplay
             if (gameOverPanel != null)
             {
                 gameOverPanel.SetActive(true);
@@ -281,12 +285,26 @@ public class PlayerScript : MonoBehaviour
         }
 
         // Fade out from black
-        timer = 0f;
-        while (timer < fadeDuration)
+        if (blackoutPanel != null)
         {
-            timer += Time.deltaTime;
-            blackoutPanel.color = Color.Lerp(endColor, startColor, timer / fadeDuration);
-            yield return null;
+            Image img = blackoutPanel.GetComponentInChildren<Image>();
+            if (img != null)
+            {
+                float fadeDuration = 0.5f;
+                float timer = 0f;
+                Color startColor = new Color(0, 0, 0, 0);
+                Color endColor = new Color(0, 0, 0, 1);
+
+                while (timer < fadeDuration)
+                {
+                    timer += Time.unscaledDeltaTime;
+                    img.color = Color.Lerp(endColor, startColor, timer / fadeDuration);
+                    yield return null;
+                }
+            }
+            
+            //Turn off the Blackout Screen Canvas when completely done fading
+            blackoutPanel.SetActive(false); 
         }
 
         isRespawning = false;
