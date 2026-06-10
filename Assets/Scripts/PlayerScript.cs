@@ -17,7 +17,8 @@ public class PlayerScript : MonoBehaviour
     public int specialitemcollected = 0;
     int totalcoins = 30;
     int health = 10;
-    Vector3 checkpointPosition; //Variable for checkpoints for lvl 2 and 3
+    public int totalDeaths = 0; //To total up the numbers of death
+    Vector3 checkpointPosition; //Variable for checkpoints for lvl 2
     GameObject currentCollectible;
     private bool isRespawning = false; //To prevent double triggering for the hazard
     public GameObject gameOverPanel; // Drag your panel here in the Inspector
@@ -29,6 +30,12 @@ public class PlayerScript : MonoBehaviour
     public Image specialItemIconDisplay;
     public GameObject collectiblesPanelObject; // Reference to hold the background panel
     public GameObject blackoutPanel; //For the blackout while death
+
+    //References for the MVP UI
+    public GameObject mvpPanel;
+    public TextMeshProUGUI mvpCoinsText;
+    public TextMeshProUGUI mvpDeathsText;
+    public TextMeshProUGUI mvpCollectiblesText;
 
     //Sounds
     public AudioSource audioSource;
@@ -52,9 +59,26 @@ public class PlayerScript : MonoBehaviour
         }
 
         // Hide UI cards at start
-        if (blueCardUI != null) blueCardUI.SetActive(false);
-        if (redCardUI != null) redCardUI.SetActive(false);
-        if (securityCardUI != null) securityCardUI.SetActive(false);
+        if (blueCardUI != null)
+        {
+            blueCardUI.SetActive(false);
+        }
+
+        if (redCardUI != null)
+        {
+            redCardUI.SetActive(false);
+        }
+
+        if (securityCardUI != null)
+        {
+            securityCardUI.SetActive(false);
+        }
+
+        // Hide MVP panel at start
+        if (mvpPanel != null)
+        {
+            mvpPanel.SetActive(false);
+        }
     }
 
     void UpdateUI()
@@ -150,10 +174,10 @@ public class PlayerScript : MonoBehaviour
         }
 
         // If the player steps onto the GoalArea
-        if (other.CompareTag("GoalArea") && coinscollected >= totalcoins)
+        if (other.CompareTag("GoalArea"))
         {
             print("Level Complete!");
-            print("Total Coins Collected: " + coinscollected + "/" + totalcoins);
+            ShowMVPCanvas();
         }
 
         // If the player step onto water/lava and haven'tspawning
@@ -185,6 +209,37 @@ public class PlayerScript : MonoBehaviour
             currentCollectible = null;
             Debug.Log("Walked away from special item.");
         }
+    }
+
+    void ShowMVPCanvas()
+    {
+        Time.timeScale = 0; // Freeze gameplay elements
+
+        // Update the UI text elements on the MVP screen
+        if (mvpCoinsText != null)
+        {
+            mvpCoinsText.text = "Coins: " + coinscollected + " / " + totalcoins;
+        }
+
+        if (mvpDeathsText != null)
+        {
+            mvpDeathsText.text = "Deaths: " + totalDeaths;
+        }
+
+        if (mvpCollectiblesText != null)
+        {
+            mvpCollectiblesText.text = "Special Items: " + specialitemcollected;
+        }
+
+        // Turn on the canvas panel
+        if (mvpPanel != null)
+        {
+            mvpPanel.SetActive(true);
+        }
+
+        // Unlock mouse cursor for navigating the panel buttons
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     //If the player want to restart the game once they lose all of their hp
@@ -225,25 +280,25 @@ public class PlayerScript : MonoBehaviour
     // Updated to accept a boolean parameter
     IEnumerator HandleDeath(bool isInstantDeath)
     {
-        isRespawning = true; 
+        isRespawning = true;
 
         if (isInstantDeath)
         {
-            health = 0; 
+            health = 0;
         }
         else
         {
-            health -= 2; 
+            health -= 2;
         }
 
         UpdateUI();
         Debug.Log("Health reduced to: " + health);
 
         //Turn on the Blackout Screen Canvas GameObject
-        if (blackoutPanel != null) 
+        if (blackoutPanel != null)
         {
             blackoutPanel.SetActive(true);
-            
+
             // Try to fade it if it has an image on it
             Image img = blackoutPanel.GetComponentInChildren<Image>();
             if (img != null)
@@ -302,9 +357,9 @@ public class PlayerScript : MonoBehaviour
                     yield return null;
                 }
             }
-            
+
             //Turn off the Blackout Screen Canvas when completely done fading
-            blackoutPanel.SetActive(false); 
+            blackoutPanel.SetActive(false);
         }
 
         isRespawning = false;

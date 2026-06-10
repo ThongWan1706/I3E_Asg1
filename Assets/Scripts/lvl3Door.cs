@@ -1,7 +1,7 @@
 /*
 * Author: Lam Thong Wan
 * Date: 9 Jun 2026
-* Description: This code is specifically for the lvl 2 door that contains the door indicator that shows whether the door is locked or not, it also includes in the open and close door animation
+* Description: This code is specifically for the lvl 3 door that contains the door indicator that shows whether the door is locked or not, it also includes in the open and close door animation
 */
 
 using UnityEngine;
